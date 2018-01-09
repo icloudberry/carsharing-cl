@@ -33,7 +33,7 @@ public class DriveNow implements Provider {
                     .min(Comparator.comparing(o -> o.price));
         }
 
-        return packageOptional.map(aPackage -> new Result(aPackage.name(), aPackage.price))
+        return packageOptional.map(aPackage -> new Result(aPackage.name(), getPrice(aPackage, dist)))
                 .orElseGet(() -> new Result("default", defaultPrice));
     }
 
@@ -43,7 +43,7 @@ public class DriveNow implements Provider {
         if (dist > aPackage.dist)
             price = price.add(new BigDecimal(dist - aPackage.dist, DECIMAL32).multiply(extra_dist_per_km));
 
-        return price;
+        return price.setScale(2, RoundingMode.CEILING);
     }
 
     private BigDecimal getDefaultPrice(int dist, int time, boolean airport) {
@@ -65,10 +65,10 @@ public class DriveNow implements Provider {
 
     @AllArgsConstructor
     enum Package {
-        THREE(3 * 60, 80, new BigDecimal(29, DECIMAL32)),
-        SIX(6 * 60, 120, new BigDecimal(54, DECIMAL32)),
-        NINE(9 * 60, 200, new BigDecimal(79, DECIMAL32)),
-        DAY(24 * 60, 200, new BigDecimal(109, DECIMAL32));
+        THREE(3 * 60, 80, new BigDecimal(29, DECIMAL32).setScale(2, RoundingMode.CEILING)),
+        SIX(6 * 60, 120, new BigDecimal(54, DECIMAL32).setScale(2, RoundingMode.CEILING)),
+        NINE(9 * 60, 200, new BigDecimal(79, DECIMAL32).setScale(2, RoundingMode.CEILING)),
+        DAY(24 * 60, 200, new BigDecimal(109, DECIMAL32).setScale(2, RoundingMode.CEILING));
 
         int time; // in min
         int dist;

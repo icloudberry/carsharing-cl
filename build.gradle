@@ -23,6 +23,7 @@ dependencies {
 
     // Use JUnit test framework
     testCompile 'junit:junit:4.12'
+    testCompile 'pl.pragmatists:JUnitParams:1.1.1'
 }
 
 // Define the main class for the application

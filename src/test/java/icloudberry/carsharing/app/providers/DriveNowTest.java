@@ -1,7 +1,10 @@
 package icloudberry.carsharing.app.providers;
 
 import icloudberry.carsharing.app.Result;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -9,6 +12,7 @@ import java.math.RoundingMode;
 import static java.math.MathContext.DECIMAL32;
 import static org.junit.Assert.*;
 
+@RunWith(JUnitParamsRunner.class)
 public class DriveNowTest {
 
     @Test(expected = IllegalArgumentException.class)
@@ -25,40 +29,32 @@ public class DriveNowTest {
     }
 
     @Test
-    public void calculatePrice_ValidInput_BigDist_ShouldReturnValidValue() {
+    @Parameters({
+//            "dist, time, expected price, expected package",
+            "250, 150, 56.5, default",
+            "250, 300, 91.7, SIX",
+            "50, 65, 18.2, default",
+            "50, 210, 54.0, SIX",
+            "80, 180, 29, THREE",
+            "80, 90, 25.2, default",
+            "120, 180, 40.6, THREE"
+    })
+    public void calculatePrice(int dist, int time, double exp, String resType) {
         DriveNow cut = new DriveNow();
-        BigDecimal expected = new BigDecimal(73.3, DECIMAL32).setScale(2, RoundingMode.CEILING);
-        assertEquals(new Result("default", expected),
-                cut.calculatePrice(250, 150, false));
+        BigDecimal expected = getExpected(exp);
+        assertEquals(new Result(resType, expected),
+                cut.calculatePrice(dist, time, false));
     }
 
     @Test
-    public void calculatePrice_ValidInput_BigDist_LongDrive_ShouldReturnValidValue() {
+    public void calculatePrice_Airport() {
         DriveNow cut = new DriveNow();
-        BigDecimal expected = new BigDecimal(73.3, DECIMAL32).setScale(2, RoundingMode.CEILING);
-        assertEquals(new Result("default", expected),
-                cut.calculatePrice(250, 300, false));
-    }
-
-    @Test
-    public void calculatePrice_ValidInput_ShortDist_ShouldReturnValidValue() {
-        DriveNow cut = new DriveNow();
-        BigDecimal expected = new BigDecimal(18.2, DECIMAL32).setScale(2, RoundingMode.CEILING);
-        assertEquals(new Result("default", expected), cut.calculatePrice(50, 65, false));
-    }
-
-    @Test
-    public void calculatePrice_ValidInput_ShortDist_LongDrive_ShouldReturnValidValue() {
-        DriveNow cut = new DriveNow();
-        BigDecimal expected = new BigDecimal(54, DECIMAL32).setScale(2, RoundingMode.CEILING);
-        assertEquals(new Result("SIX", expected), cut.calculatePrice(50, 210, false));
-    }
-
-    @Test
-    public void calculatePrice_ValidInput_Airport_ShouldReturnValidValue() {
-        DriveNow cut = new DriveNow();
-        BigDecimal expected = new BigDecimal(21.8, DECIMAL32).setScale(2, RoundingMode.CEILING);
+        BigDecimal expected = getExpected(21.8);
         assertEquals(new Result("default", expected), cut.calculatePrice(60, 35, true));
+    }
+
+    private BigDecimal getExpected(double val) {
+        return new BigDecimal(val, DECIMAL32).setScale(2, RoundingMode.CEILING);
     }
 
 }
