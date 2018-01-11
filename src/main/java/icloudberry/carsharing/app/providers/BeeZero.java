@@ -9,4 +9,9 @@ public class BeeZero implements Provider{
         return null;
     }
 
+    @Override
+    public String getName() {
+        return "BeeZero";
+    }
+
 }

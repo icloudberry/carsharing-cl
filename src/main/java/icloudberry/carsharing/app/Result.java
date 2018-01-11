@@ -9,6 +9,6 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class Result {
 
-    private String resultType;
-    private BigDecimal resultPrice;
+    private String type;
+    private BigDecimal price;
 }

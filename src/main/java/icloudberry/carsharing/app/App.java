@@ -1,12 +1,20 @@
 package icloudberry.carsharing.app;
 
-import java.math.BigDecimal;
+import icloudberry.carsharing.app.providers.CarToGo;
+import icloudberry.carsharing.app.providers.DriveNow;
+import icloudberry.carsharing.app.providers.Provider;
 
-import static java.math.MathContext.DECIMAL32;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 public class App {
+
+    private static List<Provider> providers = new ArrayList<>();
+
     public String getGreeting() {
-        return "Hello world.";
+        return "Welcome to the CarSharing Calculator!";
     }
 
     public static void main(String[] args) {
@@ -14,35 +22,29 @@ public class App {
         int dist = Integer.valueOf(args[0]);
         int time = Integer.valueOf(args[1]);
         boolean airport = Boolean.valueOf(args[2]);
-        String res = getCheapestCarsharing(dist, time, airport);
-        System.out.println(String.format("The minimal price is %s in car-sharing %s", res));
+        ResultWrapper res = getCheapestCarsharing(dist, time, airport);
+        System.out.println(String.format("The trip is %s km long, around %s minutes, to the airport: %s",
+                dist, time, airport));
+        System.out.println(String.format("The minimal price is %s in package %s, car-sharing %s",
+                res.getPrice(), res.getType(), res.getCarSharing()));
 
     }
 
-    public static String getCheapestCarsharing(int dist, int time, boolean airport) {
-        BigDecimal min = BigDecimal.valueOf(10000);
-        String res = "unknown";
-//        for (String cs : sharings) {
-        BigDecimal pr = calculatePrise("DRIVENOW", dist, time, airport);
-        if (pr.compareTo(min) < 0) {
-            min = pr;
-            res = "DN";
+    public static ResultWrapper getCheapestCarsharing(int dist, int time, boolean airport) {
+        providers.add(new CarToGo());
+        providers.add(new DriveNow());
+
+        Result min = new Result("unknown", BigDecimal.valueOf(1000));
+        Result tmp = min;
+        Provider pr = providers.get(0);
+        for (Provider p : providers) {
+            tmp = p.calculatePrice(dist, time, airport);
+            if (tmp.getPrice().compareTo(min.getPrice()) < 0) {
+                min = tmp;
+                pr = p;
+            }
         }
-        System.out.println("Prise: " + pr);
-        return res;
-    }
-
-    private static BigDecimal calculatePrise(String cs, int dist, int time, boolean airport) {
-        BigDecimal price = BigDecimal.ZERO;
-        // airport
-        if (airport)
-            price = price.add(new BigDecimal(12, DECIMAL32));
-        // time
-        price = price.add(new BigDecimal(time, DECIMAL32).multiply(new BigDecimal(0.28, DECIMAL32)));
-        //distance
-        price = price.add(new BigDecimal(0.29, DECIMAL32).multiply(new BigDecimal(dist, DECIMAL32)));
-
-        return price;
+        return new ResultWrapper(tmp, pr);
     }
 
 

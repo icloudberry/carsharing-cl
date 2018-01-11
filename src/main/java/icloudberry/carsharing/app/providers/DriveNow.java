@@ -37,6 +37,11 @@ public class DriveNow implements Provider {
                 .orElseGet(() -> new Result("default", defaultPrice));
     }
 
+    @Override
+    public String getName() {
+        return "DriveNow";
+    }
+
     private BigDecimal getPrice(Package aPackage, int dist) {
         BigDecimal price = aPackage.price;
         //distance
@@ -74,10 +79,5 @@ public class DriveNow implements Provider {
         int dist;
         BigDecimal price;
     }
-
-//    3 - 29, 80 km
-//6 - 54, 120 km
-//9 - 79, 200 km
-//24 - 109, 200 km
 
 }
